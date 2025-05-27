@@ -3,7 +3,6 @@ from PIL import Image
 import io
 import torch
 from torchvision import transforms
-from app.model.model import get_model
 import os
 
 router = APIRouter()
@@ -16,11 +15,10 @@ transform = transforms.Compose([
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
 
-# ✅ 여기만 수정!
+# ✅ 전체 모델 객체로 로드 (get_model 사용 X)
 def load_model():
-    model = get_model()
-    model_path = os.path.join("app", "model_weight", "final_best_model_v2.pth")  # 파일명만 변경!
-    model.load_state_dict(torch.load(model_path, map_location=device))
+    model_path = os.path.join("app", "model_weight", "final_best_model_v2.pth")
+    model = torch.load(model_path, map_location=device)
     model = model.to(device)
     model.eval()
     return model
