@@ -15,11 +15,27 @@ def main():
         print(f"[ERROR] 이미지 파일이 존재하지 않습니다: {image_path}")
         sys.exit(1)
 
-    # 모델 한 번만 로드 (최적화)
-    model = load_model()
-    # 이미지 로드 및 예측
-    image = Image.open(image_path).convert("RGB")
-    result = predict_image(image, model)
+    try:
+        # 모델 한 번만 로드 (최적화)
+        model = load_model()
+    except Exception as e:
+        print(f"[ERROR] 모델 로드 실패: {e}")
+        sys.exit(1)
+
+    try:
+        # 이미지 로드 및 변환
+        image = Image.open(image_path).convert("RGB")
+    except Exception as e:
+        print(f"[ERROR] 이미지 열기 실패: {e}")
+        sys.exit(1)
+
+    try:
+        # 예측 수행
+        result = predict_image(image, model)
+    except Exception as e:
+        print(f"[ERROR] 예측 중 오류 발생: {e}")
+        sys.exit(1)
+
     print(result)
 
 if __name__ == "__main__":
