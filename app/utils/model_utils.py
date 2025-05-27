@@ -34,7 +34,7 @@ def predict_image(image, model):
         probs = torch.softmax(output, dim=1)
         pred_class = probs.argmax(dim=1).item()
         confidence = probs[0, pred_class].item() * 100
-    class_labels = ["정상", "이상", "경증", "중등도"]  # 클래스 4개에 맞게 수정
+    class_labels = ["양호", "경증", "중등도", "중증"]  # 클래스 4개에 맞게 수정
     return {
         "class": class_labels[pred_class],
         "confidence": f"{confidence:.2f}%",
