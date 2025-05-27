@@ -17,10 +17,19 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Log in to DockerHub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
       - name: Build Docker image
         run: |
           docker build -t backend-app .
+          docker tag backend-app ${{ secrets.DOCKER_USERNAME }}/scalp:latest
 
       - name: Run container and check import
-        run: |
-          docker run --rm --entrypoint python backend-app -c "import app.api.main"
+        run: docker run --rm --entrypoint python backend-app -c "import app.api.main"
+
+      - name: Push Docker image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/scalp:latest
+
+      - name: Trigger Render Deploy Hook
+        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
