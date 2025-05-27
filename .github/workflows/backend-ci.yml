@@ -23,5 +23,4 @@ jobs:
 
       - name: Run container and check import
         run: |
-          docker run --rm backend-app python -c "import app.api.main"
-
+          docker run --rm --entrypoint python backend-app -c "import app.api.main"
