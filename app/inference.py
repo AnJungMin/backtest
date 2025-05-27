@@ -2,6 +2,7 @@ import os
 import torch
 from torchvision import transforms
 from PIL import Image
+from app.model.model import get_model  # 반드시 모델 구조 함수 import
 
 # 디바이스 정의
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -16,10 +17,11 @@ data_transforms = transforms.Compose([
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
 
-# 모델 로드 (weights_only=False)
+# 모델 로드 (get_model + load_state_dict)
 def load_model():
-    model = torch.load(MODEL_PATH, map_location=DEVICE, weights_only=False)
-    model = model.to(DEVICE)
+    model = get_model().to(DEVICE)
+    state_dict = torch.load(MODEL_PATH, map_location=DEVICE)
+    model.load_state_dict(state_dict)
     model.eval()
     return model
 
@@ -38,17 +40,4 @@ def predict_image(image=None, image_path=None, model=None):
         pred_class = probs.argmax(dim=1).item()
         confidence = probs[0, pred_class].item() * 100
 
-    class_labels = ["정상", "이상"]  # 실제 클래스명에 맞게 조정
-    result = {
-        "class": class_labels[pred_class],
-        "confidence": f"{confidence:.2f}%",
-        "class_index": pred_class
-    }
-    return result
-
-# 테스트용 코드 (직접 실행 시)
-if __name__ == "__main__":
-    model = load_model()
-    image_path = "test.jpg"  # 예시
-    result = predict_image(image_path=image_path, model=model)
-    print(result)
+    class_labels = ["정상", "이상"]  # 실제 클래스명_
