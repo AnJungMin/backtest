@@ -3,4 +3,3 @@ __pycache__/
 *.zip
 .git/
 .env
-model_weight/
