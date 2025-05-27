@@ -1,8 +1,5 @@
 __pycache__/
 *.pyc
-*.pkl
-*.pth
-*.pt
 *.zip
 .git/
 .env
