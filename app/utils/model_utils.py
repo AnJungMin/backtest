@@ -15,16 +15,13 @@ data_transforms = transforms.Compose([
                          [0.229, 0.224, 0.225])
 ])
 
-def get_model(num_classes=6):
-    # EfficientNet-b0 모델 생성 (pretrained=False)
+def get_model(num_classes=4):  # 학습 당시 클래스 수인 4로 수정
     model = efficientnet_b0(weights=None)
-    # 마지막 fully connected layer를 클래스 수에 맞게 수정
     model.classifier[1] = nn.Linear(model.classifier[1].in_features, num_classes)
     return model
 
 def load_model():
-    model = get_model(num_classes=6).to(DEVICE)  # 클래스 수를 학습 때 맞게 설정하세요
-    # PyTorch 2.6 이상: weights_only=True 로 state_dict만 로드
+    model = get_model(num_classes=4).to(DEVICE)  # 클래스 수 맞게 수정
     state_dict = torch.load(MODEL_PATH, map_location=DEVICE, weights_only=True)
     model.load_state_dict(state_dict)
     model.eval()
@@ -37,7 +34,7 @@ def predict_image(image, model):
         probs = torch.softmax(output, dim=1)
         pred_class = probs.argmax(dim=1).item()
         confidence = probs[0, pred_class].item() * 100
-    class_labels = ["정상", "이상", "경증", "중등도", "중증", "심각"]  # 예시: 클래스명 실제에 맞게 수정하세요
+    class_labels = ["정상", "이상", "경증", "중등도"]  # 클래스 4개에 맞게 수정
     return {
         "class": class_labels[pred_class],
         "confidence": f"{confidence:.2f}%",
