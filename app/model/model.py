@@ -2,11 +2,13 @@ import timm
 import torch.nn as nn
 
 def get_model():
-    # EfficientNet B0, num_classes=2로 이진 분류 세팅
+    """
+    EfficientNet B0 (timm), num_classes=2로 이진 분류 모델 반환
+    """
     model = timm.create_model('tf_efficientnet_b0_ns', pretrained=True, num_classes=2)
     return model
 
-# 테스트 (직접 실행용)
+# 테스트 (직접 실행 시)
 if __name__ == '__main__':
     import torch
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

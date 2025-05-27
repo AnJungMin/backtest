@@ -2,12 +2,12 @@ import os
 import torch
 from torchvision import transforms
 from PIL import Image
-import timm  # timm EfficientNet 쓴 경우
+import timm  # timm EfficientNet 사용 시
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 MODEL_PATH = os.path.join("app", "model_weight", "final_best_model_v2.pth")
 
-# ⭐ 신뢰 글로벌 등록
+# ⭐ 신뢰 글로벌 등록 (timm EfficientNet 기준)
 torch.serialization.add_safe_globals({'EfficientNet': timm.models.efficientnet.EfficientNet})
 
 data_transforms = transforms.Compose([
@@ -17,6 +17,7 @@ data_transforms = transforms.Compose([
 ])
 
 def load_model():
+    # 전체 모델 객체 복원
     model = torch.load(MODEL_PATH, map_location=DEVICE, weights_only=False)
     model = model.to(DEVICE)
     model.eval()
