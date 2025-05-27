@@ -16,9 +16,9 @@ data_transforms = transforms.Compose([
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
 
-# 모델 로드 (get_model 불필요)
+# 모델 로드 (weights_only=False)
 def load_model():
-    model = torch.load(MODEL_PATH, map_location=DEVICE)
+    model = torch.load(MODEL_PATH, map_location=DEVICE, weights_only=False)
     model = model.to(DEVICE)
     model.eval()
     return model

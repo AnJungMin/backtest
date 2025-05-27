@@ -15,10 +15,10 @@ transform = transforms.Compose([
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
 
-# ✅ 전체 모델 객체로 로드 (get_model 사용 X)
+# ✅ 전체 모델 객체로 로드 (weights_only=False 추가)
 def load_model():
     model_path = os.path.join("app", "model_weight", "final_best_model_v2.pth")
-    model = torch.load(model_path, map_location=device)
+    model = torch.load(model_path, map_location=device, weights_only=False)
     model = model.to(device)
     model.eval()
     return model
