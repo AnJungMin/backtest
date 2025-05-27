@@ -5,7 +5,7 @@ from PIL import Image
 from app.model.model import get_model  # 반드시 학습에 사용한 모델 구조여야 함
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-MODEL_PATH = os.path.join("app", "model_weight", "only_state_dict.pth")  # 저장한 state_dict 파일명으로 변경
+MODEL_PATH = os.path.join("app", "model_weight", "final_best_model_v2.pth")  # 저장한 state_dict 파일명으로 변경
 
 data_transforms = transforms.Compose([
     transforms.Resize((224, 224)),
