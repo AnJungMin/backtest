@@ -15,7 +15,8 @@ data_transforms = transforms.Compose([
 
 def load_model():
     model = get_model().to(DEVICE)
-    state_dict = torch.load(MODEL_PATH, map_location=DEVICE)
+    # PyTorch 2.6.0에선 weights_only=True 명시!
+    state_dict = torch.load(MODEL_PATH, map_location=DEVICE, weights_only=True)
     model.load_state_dict(state_dict)
     model.eval()
     return model

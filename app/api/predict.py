@@ -1,7 +1,7 @@
 from fastapi import APIRouter, File, UploadFile
 from PIL import Image
 import io
-from app.model_utils import load_model, predict_image
+from app.utils.model_utils import load_model, predict_image
 
 router = APIRouter()
 model = load_model()  # 서버 시작시 1회만 모델 로드, API 요청마다 재사용
