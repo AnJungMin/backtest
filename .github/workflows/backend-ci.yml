@@ -32,4 +32,4 @@ jobs:
         run: docker push ${{ secrets.DOCKER_USERNAME }}/scalp:latest
 
       - name: Trigger Render Deploy Hook
-        run: curl -X POST ${{ secrets.DEPLOY_KEY }}
+        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
