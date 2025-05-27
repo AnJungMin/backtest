@@ -2,14 +2,16 @@ import os
 import torch
 from torchvision import transforms
 from PIL import Image
-from app.model.model import MultiTaskMobileViT
-from app.train.config import DEVICE
-from app.recommendation.utils import get_recommendations_by_disease  # 추천 불러오기
+from app.model.model import get_model  # EfficientNet 구조 반환
+# from app.train.config import DEVICE  # DEVICE를 내부에서 직접 정의
 
-# 모델 경로
-MODEL_PATH = os.path.join("app", "model_weight", "MobileVit-XXS_2025_04_01_14_model.pt")
+# 디바이스 정의 (내부에서 처리)
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# 전처리
+# 모델 경로 (final_best_model_v2.pth)
+MODEL_PATH = os.path.join("app", "model_weight", "final_best_model_v2.pth")
+
+# 전처리 (튜닝.ipynb 코드와 동일)
 data_transforms = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
@@ -18,52 +20,42 @@ data_transforms = transforms.Compose([
 
 # 모델 로드
 def load_model():
-    model = MultiTaskMobileViT(head_channels=64).to(DEVICE)
-    checkpoint = torch.load(MODEL_PATH, map_location=DEVICE, weights_only=False)
-    model.load_state_dict(checkpoint['model_params'])
+    model = get_model().to(DEVICE)
+    model.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
     model.eval()
     return model
 
 # 예측 함수
 def predict_image(image=None, image_path=None, model=None):
+    # 이미지 로드
     if image is None and image_path is not None:
         image = Image.open(image_path).convert("RGB")
+    elif image is None:
+        raise ValueError("Image or image_path must be provided.")
 
-    image = data_transforms(image).unsqueeze(0).to(DEVICE)
+    # 전처리
+    input_tensor = data_transforms(image).unsqueeze(0).to(DEVICE)
 
+    # 추론
     with torch.no_grad():
-        outputs = model(image)
-
-    task_names = ["미세각질", "피지과다", "모낭사이홍반", "모낭홍반/농포", "비듬", "탈모"]
-    severity_labels = ["정상", "경증", "중등증", "중증"]
-
-    raw_preds = []
-    formatted_preds = []
-
-    for task_name, head in zip(task_names, outputs):
-        probs = torch.softmax(head, dim=1)
+        output = model(input_tensor)
+        probs = torch.softmax(output, dim=1)
         pred_class = probs.argmax(dim=1).item()
         confidence = probs[0, pred_class].item() * 100
 
-        raw_preds.append(pred_class)
-
-        result = {
-            "disease": task_name,
-            "severity": severity_labels[pred_class],
-            "confidence": f"{confidence:.2f}%"
-        }
-
-        # 심각도에 따른 분기 처리
-        if pred_class == 0:
-            result["comment"] = "정상 범위입니다. 두피 상태가 양호합니다."
-        elif pred_class in [1, 2]:
-            result["recommendations"] = get_recommendations_by_disease(task_name)
-        elif pred_class == 3:
-            result["hospital_recommendation"] = "주변 피부과를 추천합니다. 위치 정보를 기반으로 제공합니다."
-
-        formatted_preds.append(result)
-
-    return {
-        "raw_predictions": raw_preds,
-        "results": formatted_preds
+    # 클래스 이름은 실제 학습 데이터에 맞게 조정!
+    class_labels = ["정상", "이상"]  # 예시(이진 분류라면)
+    result = {
+        "class": class_labels[pred_class],
+        "confidence": f"{confidence:.2f}%",
+        "class_index": pred_class
     }
+
+    return result
+
+# 테스트용 코드 (직접 실행 시)
+if __name__ == "__main__":
+    model = load_model()
+    image_path = "test.jpg"  # 예시
+    result = predict_image(image_path=image_path, model=model)
+    print(result)
