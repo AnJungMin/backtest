@@ -11,3 +11,4 @@ seaborn
 torchinfo
 numpy
 timm
+opencv-python
