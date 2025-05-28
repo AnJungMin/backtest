@@ -9,6 +9,9 @@ app = FastAPI()
 # ✅ static 폴더 등록 (히트맵 이미지 접근용)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+# 예측 라우터 등록
+app.include_router(predict_router, prefix="/api", tags=["prediction"])
+
 # CORS 설정
 app.add_middleware(
     CORSMiddleware,
@@ -18,11 +21,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 예측 라우터 등록
-app.include_router(predict_router, prefix="/api", tags=["prediction"])
-
-# __main__에서 실행할 경우: uvicorn 실행
+# 아래 코드는 개발용
 if __name__ == '__main__':
     import uvicorn
-    port = int(os.environ.get("PORT", 8000))
-    uvicorn.run("app.api.main:app", host="0.0.0.0", port=port, reload=True)
+    uvicorn.run("app.api.main:app", host="0.0.0.0", port=8000, reload=True)

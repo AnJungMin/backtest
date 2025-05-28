@@ -1,7 +1,7 @@
 import sys
 import os
 from PIL import Image
-from app.utils.model_utils import load_model, predict_image
+from app.core.model_loader import load_model, predict_image
 
 def main():
     # 이미지 경로 입력받기 (인자 없으면 test.jpg)
