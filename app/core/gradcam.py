@@ -13,7 +13,7 @@ def generate_heatmap(image: Image.Image, model: torch.nn.Module) -> Image.Image:
     input_tensor = data_transforms(image).unsqueeze(0).to(DEVICE)
 
     # 2. 마지막 conv layer feature 추출 설정 (EfficientNetB0 기준)
-    return_nodes = {"features.6.2.conv": "feat"}  # 해당 레이어 이름 정확해야 함
+    return_nodes = {"features.8.0": "feat"}  # 해당 레이어 이름 정확해야 함
     feature_extractor = create_feature_extractor(model, return_nodes=return_nodes)
 
     # 3. forward pass & feature map 추출
