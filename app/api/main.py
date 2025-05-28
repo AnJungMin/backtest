@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from app.api.predict import router as predict_router
+import os
 
 app = FastAPI()
 
@@ -23,4 +24,5 @@ app.include_router(predict_router, prefix="/api", tags=["prediction"])
 # __main__에서 실행할 경우: uvicorn 실행
 if __name__ == '__main__':
     import uvicorn
-    uvicorn.run("api.main:app", host="0.0.0.0", port=8000, reload=True)
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("app.api.main:app", host="0.0.0.0", port=port, reload=True)
