@@ -35,14 +35,16 @@ async def predict(file: UploadFile = File(...)):
 
         # ✅ static 경로 생성 및 저장
         static_dir = "static"
-        os.makedirs(static_dir, exist_ok=True)  # 폴더 없을 경우 생성
+        os.makedirs(static_dir, exist_ok=True)
         heatmap_filename = f"heatmap_{uuid.uuid4().hex}.jpg"
         heatmap_path = os.path.join(static_dir, heatmap_filename)
         heatmap.save(heatmap_path)
 
-        # ✅ 응답 반환
+        # ✅ 응답 포맷 수정 (프론트가 기대하는 구조에 맞게)
         return {
-            "result": result,
+            "class": result["class"],
+            "confidence": result["confidence"],
+            "class_index": result["class_index"],
             "heatmap_url": f"/static/{heatmap_filename}"
         }
 
