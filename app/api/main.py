@@ -1,22 +1,26 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from app.api.predict import router as predict_router
 
 app = FastAPI()
 
-# CORS 설정 (배포 시에는 allow_origins에 프론트엔드 주소 넣기!)
+# ✅ static 폴더 등록 (히트맵 이미지 접근용)
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# CORS 설정
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 예: ["https://fronttest-ajbj.onrender.com"]
+    allow_origins=["*"],  # 운영 환경에서는 프론트엔드 도메인으로 제한 권장
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# 예측 라우터 등록 (예: POST /api/predict)
+# 예측 라우터 등록
 app.include_router(predict_router, prefix="/api", tags=["prediction"])
 
-# __main__에서 uvicorn 서버 실행 코드
+# __main__에서 실행할 경우: uvicorn 실행
 if __name__ == '__main__':
     import uvicorn
-    uvicorn.run("app.api.main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("api.main:app", host="0.0.0.0", port=8000, reload=True)
